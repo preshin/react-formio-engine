@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Form, FormBuilder, FormEngineProvider, Formio } from '../src/index';
 import 'bootstrap/dist/css/bootstrap.css';
-import 'formiojs/dist/formio.full.css';
+import '../src/themes/default.css';
 
 // Suppress "Missing projectId" warnings — we use formiojs purely client-side
 Formio.setProjectUrl(window.location.href);

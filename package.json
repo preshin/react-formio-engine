@@ -54,6 +54,6 @@
   },
   "license": "MIT",
   "dependencies": {
-    "formiojs": "^4.21.7"
+    "@formio/js": "^5.3.0"
   }
 }

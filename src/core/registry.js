@@ -1,4 +1,4 @@
-import { Formio } from 'formiojs';
+import { Formio } from '@formio/js';
 
 /**
  * Register a custom component with the form engine.

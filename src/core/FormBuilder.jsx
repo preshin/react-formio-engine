@@ -1,10 +1,5 @@
 import { useRef, useEffect } from 'react';
-import FormioFormBuilder from 'formiojs/FormBuilder';
-import Components from 'formiojs/components/Components';
-import components from 'formiojs/components';
-
-// Register all built-in formio components
-Components.setComponents(components);
+import { FormBuilder as FormioFormBuilder } from '@formio/js';
 
 const FormBuilder = ({
   form,

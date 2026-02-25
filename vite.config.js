@@ -12,11 +12,9 @@ export default defineConfig(({ command }) => {
         loader: 'jsx',
         include: /\.jsx?$/,
       },
-      // optimizeDeps needed because formiojs is CJS
+      // optimizeDeps needed because @formio/js is CJS
       optimizeDeps: {
-        include: ['formiojs', 'formiojs/Form', 'formiojs/FormBuilder',
-                  'formiojs/components', 'formiojs/components/Components',
-                  'formiojs/components/_classes/field/Field'],
+        include: ['@formio/js'],
         esbuildOptions: {
           loader: { '.js': 'jsx' },
         },
@@ -35,10 +33,10 @@ export default defineConfig(({ command }) => {
         fileName: (format) => `form-engine.${format}.js`,
       },
       rollupOptions: {
-        // Externalize react, react-dom, and all formiojs imports
+        // Externalize react, react-dom, and all @formio/js imports
         external: (id) => {
           if (id === 'react' || id === 'react-dom' || id.startsWith('react-dom/')) return true;
-          if (id === 'formiojs' || id.startsWith('formiojs/')) return true;
+          if (id === '@formio/js' || id.startsWith('@formio/js/')) return true;
           if (id === 'eventemitter2') return true;
           return false;
         },
@@ -47,7 +45,7 @@ export default defineConfig(({ command }) => {
             react: 'React',
             'react-dom': 'ReactDOM',
             'react-dom/client': 'ReactDOMClient',
-            formiojs: 'Formio',
+            '@formio/js': 'Formio',
           },
         },
       },

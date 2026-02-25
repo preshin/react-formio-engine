@@ -8,4 +8,11 @@
  * Usage:
  *   import '@workato/form-engine/themes/default.css';
  */
-@import 'formiojs/dist/formio.full.css';
+@import '@formio/js/dist/formio.full.css';
+
+/* Make builder sidebar component buttons uniform width */
+.formcomponents .btn.formcomponent {
+  display: block;
+  width: 100%;
+  text-align: left;
+}

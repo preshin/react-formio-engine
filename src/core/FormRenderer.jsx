@@ -1,22 +1,6 @@
 import { useRef, useEffect, useImperativeHandle, forwardRef, useContext } from 'react';
-import { Formio } from 'formiojs';
-import FormioForm from 'formiojs/Form';
-import Components from 'formiojs/components/Components';
-import components from 'formiojs/components';
+import { Form as FormioForm } from '@formio/js';
 import { FormEngineContext } from './FormEngineProvider';
-
-// Register all built-in formio components
-Components.setComponents(components);
-
-// During migration, both @converselabs/formiojs (v4.8) and formiojs (v4.21)
-// may coexist. Both set window.Formio, but the converselabs version loads first
-// and lacks the .cdn property that v4.21+ requires. Override the global with
-// the official version to prevent "Cannot read properties of undefined (reading 'baseUrl')".
-// This is safe because v4.21 is backward compatible with v4.8 API.
-// After migration (when @converselabs is removed), this becomes a no-op.
-if (typeof window !== 'undefined') {
-  window.Formio = Formio;
-}
 
 const FormRenderer = forwardRef(function FormRenderer(
   { src, form, submission, options = {}, onSubmit, onChange, onError, onRender,

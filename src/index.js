@@ -9,16 +9,17 @@ export { FormEngineContext } from './core/FormEngineProvider';
 export { createFormComponent } from './core/createFormComponent';
 export { registerComponent } from './core/registry';
 
-// Re-export ReactComponent from formiojs for backward compatibility with
-// custom components that extend it (ColorPicker, AceEditor, etc.).
-// New custom components should use createFormComponent() instead.
-export { default as ReactComponent } from 'formiojs/components/_classes/field/Field';
+// Re-export from @formio/js — accessed via Components to avoid restricted deep imports
+import { Components, Formio as _Formio } from '@formio/js';
 
-// Re-export baseEditForm for custom component settings forms
-export { default as baseEditForm } from 'formiojs/components/_classes/component/Component.form';
+// ReactComponent (Field class) for backward compat with custom components
+export const ReactComponent = Components.components.field;
+
+// baseEditForm for custom component settings forms
+export const baseEditForm = Components.baseEditForm;
 
 // Form schema helpers
 export { removeSubmitFormio, removeAutoFocusFormio } from './utils/helpers';
 
 // Re-export Formio singleton for advanced usage (component registration, etc.)
-export { Formio } from 'formiojs';
+export const Formio = _Formio;

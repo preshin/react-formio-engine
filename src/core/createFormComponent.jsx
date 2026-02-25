@@ -1,5 +1,5 @@
 import { createRoot } from 'react-dom/client';
-import Field from 'formiojs/components/_classes/field/Field';
+import { Components } from '@formio/js';
 
 /**
  * Factory function for creating custom formio components using a functional API.
@@ -28,8 +28,8 @@ export function createFormComponent({
   settingsForm,
   render,
 }) {
-  // Use Field from formiojs as the base class (same as the original ReactComponent)
-  const Base = Field.default || Field;
+  // Get Field class from Components registry (avoids restricted deep imports in @formio/js v5)
+  const Base = Components.components.field;
 
   return class CustomFormComponent extends Base {
     static get builderInfo() {
