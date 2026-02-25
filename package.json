@@ -1,6 +1,6 @@
 {
   "name": "react-formio-engine",
-  "version": "1.0.7",
+  "version": "1.1.0",
   "description": "Form engine with builder and renderer - formiojs-powered with React functional components",
   "type": "module",
   "main": "dist/form-engine.umd.js",
