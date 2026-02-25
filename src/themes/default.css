@@ -10,9 +10,10 @@
  */
 @import '@formio/js/dist/formio.full.css';
 
-/* Make builder sidebar component buttons uniform width */
+/* Make builder sidebar component buttons uniform width with spacing */
 .formcomponents .btn.formcomponent {
   display: block;
   width: 100%;
   text-align: left;
+  margin: 4px 0 !important;
 }
