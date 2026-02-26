@@ -1,0 +1,19 @@
+/*
+ * Default theme for react-formio-engine
+ *
+ * This imports formio's self-contained CSS which includes all necessary
+ * styles for form rendering. No external framework (antd, Bootstrap, etc.)
+ * is required.
+ *
+ * Usage:
+ *   import 'react-formio-engine/themes/default.css';
+ */
+@import '@formio/js/dist/formio.full.css';
+
+/* Make builder sidebar component buttons uniform width with spacing */
+.formcomponents .btn.formcomponent {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin: 4px 0 !important;
+}

@@ -1,0 +1,65 @@
+/*
+ * Ant Design theme for react-formio-engine
+ *
+ * Imports the default formio CSS and adds overrides to better match
+ * Ant Design's visual style. Use this in projects that use antd.
+ *
+ * Usage:
+ *   import 'react-formio-engine/themes/antd.css';
+ */
+@import './default.css';
+
+/* Ant Design style overrides for formio components */
+.form-engine-theme-antd .formio-component input.form-control {
+  border-radius: 6px;
+  border-color: #d9d9d9;
+  padding: 4px 11px;
+  font-size: 14px;
+  line-height: 1.5714;
+  transition: all 0.2s;
+}
+
+.form-engine-theme-antd .formio-component input.form-control:hover {
+  border-color: #5159F6;
+}
+
+.form-engine-theme-antd .formio-component input.form-control:focus {
+  border-color: #5159F6;
+  box-shadow: 0 0 0 2px rgba(81, 89, 246, 0.2);
+  outline: none;
+}
+
+.form-engine-theme-antd .formio-component .btn-primary {
+  background-color: #5159F6;
+  border-color: #5159F6;
+  border-radius: 6px;
+  font-size: 14px;
+  padding: 4px 15px;
+  line-height: 1.5714;
+  transition: all 0.2s;
+}
+
+.form-engine-theme-antd .formio-component .btn-primary:hover {
+  background-color: #351DCB;
+  border-color: #351DCB;
+}
+
+.form-engine-theme-antd .formio-component select.form-control {
+  border-radius: 6px;
+  border-color: #d9d9d9;
+  padding: 4px 11px;
+  font-size: 14px;
+}
+
+.form-engine-theme-antd .formio-component textarea.form-control {
+  border-radius: 6px;
+  border-color: #d9d9d9;
+  padding: 4px 11px;
+  font-size: 14px;
+}
+
+.form-engine-theme-antd .formio-component label {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.88);
+  font-weight: 500;
+}
