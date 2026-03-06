@@ -10,6 +10,11 @@
  */
 @import '@formio/js/dist/formio.full.css';
 
+/* Bootstrap's .visually-hidden is expected by formio.js but not bundled */
+.visually-hidden {
+  display: none;
+}
+
 /* Make builder sidebar component buttons uniform width with spacing */
 .formcomponents .btn.formcomponent {
   display: block;
