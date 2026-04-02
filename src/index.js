@@ -11,6 +11,7 @@ export { registerComponent } from './core/registry';
 
 // Re-export from @formio/js — accessed via Components to avoid restricted deep imports
 import { Components, Formio as _Formio } from '@formio/js';
+import { createNumberMask } from '@formio/text-mask-addons';
 
 // ---------------------------------------------------------------------------
 // @formio/js v5 runtime patches
@@ -50,6 +51,27 @@ if (EditGrid?.prototype?.saveRow) {
       this.root = {};
     }
     return _origSaveRow.call(this, rowIndex, modified);
+  };
+}
+
+// Patch 3: Number component — allow leading zeros as first digit
+// createNumberMask defaults allowLeadingZeroes to false, which strips the leading
+// zero when a second digit is typed (e.g. typing "07" becomes "7"). This breaks
+// use cases where users need to enter values starting with 0 (e.g. "0.5", "007").
+const NumberComponent = Components.components?.number;
+if (NumberComponent?.prototype?.createNumberMask) {
+  NumberComponent.prototype.createNumberMask = function () {
+    return createNumberMask({
+      prefix: '',
+      suffix: '',
+      requireDecimal: this.component?.requireDecimal ?? false,
+      thousandsSeparatorSymbol: this.delimiter || '',
+      decimalSymbol: this.component?.decimalSymbol ?? this.decimalSeparator,
+      decimalLimit: this.component?.decimalLimit ?? this.decimalLimit,
+      allowNegative: this.component?.allowNegative ?? true,
+      allowDecimal: this.isDecimalAllowed(),
+      allowLeadingZeroes: true,
+    });
   };
 }
 
