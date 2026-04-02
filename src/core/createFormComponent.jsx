@@ -58,16 +58,37 @@ export function createFormComponent({
       this._root = null;
     }
 
-    updateValue = (value) => {
+    updateValue = (value, flags = {}) => {
       const newValue = value === undefined || value === null ? this.getValue() : value;
       const changed = newValue !== undefined ? this.hasChanged(newValue, this.dataValue) : false;
-      this.dataValue = Array.isArray(newValue) ? [...newValue] : newValue;
-      this.updateOnChange({}, changed);
-      return true;
+      if (changed) {
+        this.dataValue = Array.isArray(newValue) ? [...newValue] : newValue;
+        this.updateOnChange(flags, changed);
+      }
+      return changed;
     };
 
     render() {
       return super.render(`<div ref="react-${this.id}"></div>`);
+    }
+
+    // Wraps updateValue with { modified: true } so that user-driven React
+    // onChange calls correctly mark the component as no longer pristine,
+    // enabling proper real-time validation error display.
+    _onReactChange = (value) => {
+      this.updateValue(value, { modified: true });
+    };
+
+    _renderReact(value) {
+      if (!this._root) return;
+      this._root.render(
+        render({
+          component: this.component,
+          value,
+          onChange: this._onReactChange,
+          data: this.data,
+        })
+      );
     }
 
     attach(element) {
@@ -77,14 +98,7 @@ export function createFormComponent({
       const reactEl = this.refs[`react-${this.id}`];
       if (reactEl) {
         this._root = createRoot(reactEl);
-        this._root.render(
-          render({
-            component: this.component,
-            value: this.dataValue,
-            onChange: this.updateValue,
-            data: this.data,
-          })
-        );
+        this._renderReact(this.dataValue);
 
         if (this.shouldSetValue) {
           this.setValue(this.dataForSetting);
@@ -105,14 +119,7 @@ export function createFormComponent({
 
     setValue(value) {
       if (this._root) {
-        this._root.render(
-          render({
-            component: this.component,
-            value: value,
-            onChange: this.updateValue,
-            data: this.data,
-          })
-        );
+        this._renderReact(value);
         this.shouldSetValue = false;
       } else {
         this.shouldSetValue = true;

@@ -7,6 +7,11 @@ export default defineConfig(({ command }) => {
   if (command === 'serve') {
     return {
       plugins: [react()],
+      // Force a single React instance regardless of where it's imported from
+      // (prevents "Invalid hook call" when @formio/js pulls in its own React)
+      resolve: {
+        dedupe: ['react', 'react-dom'],
+      },
       // Handle JSX in .js and .jsx files
       esbuild: {
         loader: 'jsx',

@@ -74,6 +74,43 @@ const contactForm = {
   ],
 };
 
+// Form specifically for testing the two bug fixes:
+//   1. Number field — typing 0 as first digit should not be stripped
+//   2. Required validation — submit with empty fields must show errors
+const bugFixForm = {
+  display: 'form',
+  components: [
+    {
+      type: 'number',
+      key: 'quantity',
+      label: 'Quantity (try typing 0, then another digit — should keep the 0)',
+      input: true,
+      validate: { required: true },
+      placeholder: 'e.g. 07, 0.5, 042',
+    },
+    {
+      type: 'number',
+      key: 'price',
+      label: 'Price (required — leave empty and hit Submit to test validation)',
+      input: true,
+      validate: { required: true },
+    },
+    {
+      type: 'textfield',
+      key: 'name',
+      label: 'Name (required)',
+      input: true,
+      validate: { required: true },
+    },
+    {
+      type: 'button',
+      action: 'submit',
+      label: 'Submit',
+      theme: 'primary',
+    },
+  ],
+};
+
 // ---------- Demo Components ----------
 
 function FormRendererDemo() {
@@ -188,6 +225,41 @@ function FormBuilderDemo() {
   );
 }
 
+function BugFixDemo() {
+  const [submitted, setSubmitted] = useState(null);
+
+  return (
+    <div style={{ marginBottom: 40 }}>
+      <h2>Bug Fix Verification</h2>
+      <ul style={{ color: '#555', lineHeight: 1.8 }}>
+        <li>
+          <strong>Number — leading zero:</strong> Type <code>07</code> or <code>0.5</code> in
+          the Quantity field. The <code>0</code> should NOT be stripped.
+        </li>
+        <li>
+          <strong>Required validation:</strong> Leave fields empty and click Submit.
+          Inline error messages should appear (not silently blocked).
+        </li>
+      </ul>
+      <div style={{ border: '1px solid #ddd', padding: 20, borderRadius: 8 }}>
+        <Form
+          src={bugFixForm}
+          options={{ noAlerts: true }}
+          onSubmit={(sub) => setSubmitted(sub.data)}
+        />
+      </div>
+      {submitted && (
+        <div style={{ marginTop: 16 }}>
+          <h4>✅ Submitted Data:</h4>
+          <pre style={{ background: '#f5f5f5', padding: 12, borderRadius: 4 }}>
+            {JSON.stringify(submitted, null, 2)}
+          </pre>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ---------- App ----------
 
 function App() {
@@ -199,6 +271,8 @@ function App() {
           This demo verifies that FormRenderer, FormBuilder, and the theme
           provider work correctly.
         </p>
+        <hr />
+        <BugFixDemo />
         <hr />
         <FormRendererDemo />
         <FormRendererWithDataDemo />
