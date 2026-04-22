@@ -27,6 +27,118 @@ const FormRenderer = forwardRef(function FormRenderer(
 
     const opts = { ...options };
 
+    // When onSubmit is a prop, route it through a beforeSubmit hook so the
+    // submit button stays in its loading state until the caller's async
+    // work resolves. Supports three patterns:
+    //   1. onSubmit returns a Promise  → await it
+    //   2. onSubmit emits manually     → listen once for submitDone/Error
+    //   3. onSubmit throws synchronously → treat as rejection
+    if (typeof onSubmit === 'function') {
+      const userHooks = opts.hooks || {};
+      const userBeforeSubmit = userHooks.beforeSubmit;
+
+      opts.hooks = {
+        ...userHooks,
+        beforeSubmit: (submission, next) => {
+          const runOnSubmit = () => {
+            const formio = formioRef.current;
+
+            // Schema-only forms / nosubmit never emit submitDone themselves,
+            // so we must emit it ourselves on success.
+            const needsManualDoneEmit = () =>
+              formio && (formio.nosubmit || !formio.formio);
+
+            // Defensive: formio's own button listeners can leave the spinner
+            // `<i>` attached to the DOM when the button gets redrawn between
+            // click and completion (element.loader becomes orphaned). Force
+            // loading/disabled off on every submit button via its component
+            // ref to guarantee the spinner is cleared.
+            const resetSubmitButtons = () => {
+              if (!formio || typeof formio.everyComponent !== 'function') return;
+              formio.everyComponent((c) => {
+                if (
+                  c &&
+                  c.component &&
+                  c.component.type === 'button' &&
+                  c.component.action === 'submit'
+                ) {
+                  try {
+                    c.loading = false;
+                    c.disabled = false;
+                  } catch (_) {
+                    // best-effort — ignore
+                  }
+                }
+              });
+            };
+
+            let result;
+            try {
+              result = onSubmit(submission);
+            } catch (err) {
+              next(err);
+              if (formio) formio.emit('submitError', err);
+              resetSubmitButtons();
+              return;
+            }
+
+            if (result && typeof result.then === 'function') {
+              result.then(
+                (data) => {
+                  next();
+                  if (needsManualDoneEmit()) {
+                    formio.emit('submitDone', data ?? submission);
+                  }
+                  resetSubmitButtons();
+                },
+                (err) => {
+                  const e = err || { message: 'Submission failed' };
+                  next(e);
+                  if (formio) formio.emit('submitError', e);
+                  resetSubmitButtons();
+                },
+              );
+              return;
+            }
+
+            // Legacy manual-emit pattern: onSubmit returned nothing, so wait
+            // for the caller to emit submitDone/submitError on the formio ref.
+            // If neither is ever emitted the button stays loading — that
+            // surfaces the caller's missing completion signal rather than
+            // hiding it.
+            if (!formio) {
+              next();
+              return;
+            }
+            const cleanup = () => {
+              formio.off('submitDone', onDone);
+              formio.off('submitError', onErr);
+            };
+            const onDone = () => {
+              cleanup();
+              next();
+              resetSubmitButtons();
+            };
+            const onErr = (err) => {
+              cleanup();
+              next(err || { message: 'Submission failed' });
+              resetSubmitButtons();
+            };
+            formio.on('submitDone', onDone);
+            formio.on('submitError', onErr);
+          };
+
+          if (typeof userBeforeSubmit === 'function') {
+            userBeforeSubmit(submission, (err) =>
+              err ? next(err) : runOnSubmit(),
+            );
+          } else {
+            runOnSubmit();
+          }
+        },
+      };
+    }
+
     const FormClass = formioform || FormioForm;
     const instance = new FormClass(elementRef.current, formDef, opts);
     instanceRef.current = instance;
@@ -44,6 +156,11 @@ const FormRenderer = forwardRef(function FormRenderer(
     // Map formio.xxx events to onXxx props
     instance.onAny(function (event, ...args) {
       if (event.startsWith('formio.')) {
+        // When onSubmit is a prop we already invoke it from the beforeSubmit
+        // hook above; skip the onAny dispatch to avoid calling it twice.
+        if (event === 'formio.submit' && typeof onSubmit === 'function') {
+          return;
+        }
         const funcName = 'on' + event.charAt(7).toUpperCase() + event.slice(8);
         const allProps = {
           onSubmit, onChange, onError, onRender, onCustomEvent, onSubmitDone,
