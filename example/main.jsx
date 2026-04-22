@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Form, FormBuilder, FormEngineProvider, Formio } from '../src/index';
 import 'bootstrap/dist/css/bootstrap.css';
 import '../src/themes/default.css';
+import LoginApiDemo from './LoginApiDemo';
 
 // Suppress "Missing projectId" warnings — we use formiojs purely client-side
 Formio.setProjectUrl(window.location.href);
@@ -271,6 +272,8 @@ function App() {
           This demo verifies that FormRenderer, FormBuilder, and the theme
           provider work correctly.
         </p>
+        <hr />
+        <LoginApiDemo />
         <hr />
         <BugFixDemo />
         <hr />
