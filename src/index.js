@@ -75,6 +75,51 @@ if (NumberComponent?.prototype?.createNumberMask) {
   };
 }
 
+// Patch 4: File component — default imageSize to '100' (formio's default is '200')
+//
+// Two parts: (a) wrap the static schema so newly added File components in the
+// builder and runtime defaults for forms whose JSON omits imageSize both pick
+// up '100'. User-provided imageSize in form JSON still wins via lodash _.merge.
+// (b) Walk the File editForm definition and disable clearOnHide on the
+// imageSize textfield. The textfield is conditionally hidden until "Display
+// as image(s)" is checked, and inherits clearOnHide:true, so without this
+// formio strips data.imageSize the moment the edit dialog renders — leaving
+// the preview <img> with style="width:px" and the field showing only its
+// placeholder until the user retypes a number.
+const FileComponent = Components.components?.file;
+if (FileComponent?.schema) {
+  const _origFileSchema = FileComponent.schema.bind(FileComponent);
+  FileComponent.schema = function (...extend) {
+    return _origFileSchema({ imageSize: '100' }, ...extend);
+  };
+}
+if (FileComponent?.editForm) {
+  const _origFileEditForm = FileComponent.editForm;
+  FileComponent.editForm = function (...args) {
+    const result = _origFileEditForm.apply(this, args);
+    const walk = (comps) => {
+      if (!Array.isArray(comps)) return;
+      for (const c of comps) {
+        if (!c || typeof c !== 'object') continue;
+        if (c.key === 'imageSize') {
+          c.clearOnHide = false;
+        }
+        if (Array.isArray(c.components)) walk(c.components);
+        if (Array.isArray(c.columns)) {
+          c.columns.forEach((col) => walk(col?.components));
+        }
+        if (Array.isArray(c.rows)) {
+          c.rows.forEach(
+            (row) => Array.isArray(row) && row.forEach((col) => walk(col?.components)),
+          );
+        }
+      }
+    };
+    walk(result?.components);
+    return result;
+  };
+}
+
 // ---------------------------------------------------------------------------
 
 // ReactComponent (Field class) for backward compat with custom components
