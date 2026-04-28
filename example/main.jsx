@@ -206,6 +206,7 @@ function FormBuilderDemo() {
                   select: true,
                   radio: true,
                   number: true,
+                  file: true,
                   button: true,
                 },
               },
